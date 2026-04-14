@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "fiap_azure_gitactions_azure_function": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7178",
+      "launchBrowser": false
+    }
+  }
+}
