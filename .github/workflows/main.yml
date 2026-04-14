@@ -1,0 +1,52 @@
+name: Deploy Azure Function
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  FUNCTIONAPP_NAME: func-message-demo
+  RESOURCE_GROUP: rg-fiap-lab
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    # Checkout
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # Setup .NET
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    # Azure Login
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS_PRD }}
+
+    # Build Function
+    - name: Build Function
+      run: |
+        dotnet build --configuration Release
+
+    # Publish Function
+    - name: Publish Function
+      run: |
+        dotnet publish \
+          --configuration Release \
+          --output ./publish
+
+    # Deploy to Azure Function
+    - name: Deploy Function
+      uses: Azure/functions-action@v1
+      with:
+        app-name: ${{ env.FUNCTIONAPP_NAME }}
+        package: ./publish
